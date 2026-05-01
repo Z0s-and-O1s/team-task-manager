@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+
+    <style>
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: Arial;
+        background: white;
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+    }
+
+    .container {
+        width: 400px;
+    }
+
+    h2, h3 {
+        text-align: center;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+    }
+
+    button {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        background: black;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .box {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    select {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background: white;
+    }
+
+    select[multiple] {
+        height: 120px;
+    }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Dashboard</h2>
+
+<p id="userRole"></p>
+
+<div class="box">
+    <h3>Stats</h3>
+    <button onclick="loadStats()">Load Stats</button>
+    <p id="stats"></p>
+</div>
+
+<div class="box" id="projectBox">
+    <h3>Add Project</h3>
+    <input id="projectName" placeholder="Project name">
+    <select id="projectMembers" multiple size="4"></select>
+    <button onclick="createProject()">Create Project</button>
+</div>
+
+<div class="box" id="taskCreateBox">
+    <h3>Create Task</h3>
+    <input id="taskTitle" placeholder="Task title">
+    <input type="date" id="dueDate">
+    <select id="projectSelect"></select>
+    <select id="userSelect"></select>
+    <button onclick="createTask()">Create Task</button>
+</div>
+
+<div class="box">
+    <h3>Update Task</h3>
+    <select id="taskSelect"></select>
+    <button onclick="markComplete()">Mark Completed</button>
+</div>
+
+<div class="box" id="addMemberBox">
+    <h3>Add Member</h3>
+    <select id="projectSelectMember"></select>
+    <select id="userSelectMember"></select>
+    <button onclick="addMember()">Add Member</button>
+</div>
+
+<div class="box">
+    <h3>My Tasks</h3>
+    <button onclick="loadTasks()">Load Tasks</button>
+    <ul id="taskList"></ul>
+</div>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+
+const token = localStorage.getItem('token');
+
+async function loadStats() {
+    const res = await fetch('http://localhost:5000/api/tasks/dashboard', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    document.getElementById('stats').innerText =
+        "Total: " + data.total +
+        " | Pending: " + data.pending +
+        " | Completed: " + data.completed +
+        " | Overdue: " + data.overdue;
+}
+
+async function createTask() {
+    await fetch('http://localhost:5000/api/tasks', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+        title: document.getElementById('taskTitle').value,
+        projectId: document.getElementById('projectSelect').value,
+        assignedTo: document.getElementById('userSelect').value,
+        dueDate: document.getElementById('dueDate').value
+        })
+    });
+
+    alert("Task created");
+    loadTasks();
+    loadTasksDropdown();
+}
+
+async function markComplete() {
+    const id = document.getElementById('taskSelect').value;
+
+    await fetch('http://localhost:5000/api/tasks/' + id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ status: 'completed' })
+    });
+
+    alert("Task updated");
+    loadTasks();
+    loadTasksDropdown();
+}
+
+async function addMember() {
+    const proj = document.getElementById('projectSelectMember').value;
+    const user = document.getElementById('userSelectMember').value;
+
+    await fetch('http://localhost:5000/api/projects/add-member/' + proj, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ userId: user })
+    });
+
+    alert("Member added");
+    loadProjects();
+}
+
+function logout() {
+    localStorage.removeItem('token');
+    window.location.href = 'login.html';
+}
+
+async function loadTasks() {
+    const res = await fetch('http://localhost:5000/api/tasks', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    const data = await res.json();
+    const list = document.getElementById('taskList');
+    list.innerHTML = "";
+
+    data.forEach(task => {
+        const li = document.createElement('li');
+        li.innerHTML =
+            "<b>" + task.title + "</b><br>" +
+            "Task ID: " + task._id.substring(0,6) + "<br>" +
+            "Status: " + task.status + "<br>" +
+            "Due: " + (task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "No date")
+        list.appendChild(li);
+    });
+}
+
+async function loadUsers() {
+    const res = await fetch('http://localhost:5000/api/auth/all', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    const users = await res.json();
+
+    const selects = [
+        document.getElementById('userSelect'),
+        document.getElementById('userSelectMember'),
+        document.getElementById('projectMembers')
+    ];
+
+    selects.forEach(select => select.innerHTML = "");
+
+    users.forEach(u => {
+        selects.forEach(select => {
+            const opt = document.createElement('option');
+            opt.value = u._id;
+            opt.text = u.name;
+            select.appendChild(opt);
+        });
+    });
+}
+
+async function loadProjects() {
+    const res = await fetch('http://localhost:5000/api/projects', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    const projects = await res.json();
+
+    const select1 = document.getElementById('projectSelect');
+    const select2 = document.getElementById('projectSelectMember');
+
+    select1.innerHTML = "";
+    select2.innerHTML = "";
+
+    projects.forEach(p => {
+        const opt1 = document.createElement('option');
+        opt1.value = p._id;
+        opt1.text = p.name;
+
+        const opt2 = opt1.cloneNode(true);
+
+        select1.appendChild(opt1);
+        select2.appendChild(opt2);
+    });
+}
+
+async function loadTasksDropdown() {
+    const res = await fetch('http://localhost:5000/api/tasks', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    const tasks = await res.json();
+
+    const select = document.getElementById('taskSelect');
+    select.innerHTML = "";
+
+    tasks.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t._id;
+        option.text = t.title + " (" + t.status + ")";
+        select.appendChild(option);
+    });
+}
+
+async function createProject() {
+    const name = document.getElementById('projectName').value;
+
+    const membersSelect = document.getElementById('projectMembers');
+    const members = Array.from(membersSelect.selectedOptions).map(o => o.value);
+
+    await fetch('http://localhost:5000/api/projects', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+            name,
+            members
+        })
+    });
+
+    alert("Project created");
+    loadProjects();
+    loadUsers();
+}
+
+function showRole() {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    document.getElementById('userRole').innerText = "Role: " + payload.role;
+}
+
+function applyRoleUI() {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.role === 'member') {
+        document.getElementById('projectBox').style.display = 'none';
+        document.getElementById('taskCreateBox').style.display = 'none';
+        document.getElementById('addMemberBox').style.display = 'none';
+    }
+}
+
+window.onload = () => {
+    showRole();
+    applyRoleUI();
+    loadUsers();
+    loadProjects();
+    loadTasksDropdown();
+};
+
+</script>
+
+</body>
+</html>
