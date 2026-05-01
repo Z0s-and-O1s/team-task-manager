@@ -1,69 +1,139 @@
-# team-task-manager
-An App built for Drive Assesment
+# Team Task Manager
 
-Team Task Manager
+## 📌 Project Overview
 
-Features:
-- User authentication (JWT)
-- Project creation
-- Task assignment
-- Task status tracking
-- Dashboard (total, pending, completed, overdue)
+This is a simple Team Task Manager web application.
+It allows users to create projects, assign tasks, and track progress.
 
-Tech:
-- Node.js
-- Express
-- MongoDB
-- Railway deployment
+The goal of this project is to demonstrate a basic full-stack system with authentication, role-based access, and task tracking.
 
-Steps to run:
-1. npm install
-2. add .env
-3. npm run dev
+---
 
-⚡ Your Execution Plan (STRICT)
-⏱️ Total time: ~10 hours
-🟢 Step 1 (1 hr)
+## 🚀 Features
 
-Setup:
+### 🔐 Authentication
 
-Express server
-MongoDB Atlas connection
-Basic folder structure
-🟢 Step 2 (2 hrs)
+* User Signup and Login
+* JWT-based authentication
+* Only logged-in users can access the system
 
-Authentication:
+### 👤 Role-Based Access
 
-Signup
-Login
-JWT token
-🟢 Step 3 (3 hrs)
+* Admin:
 
-Core Features:
+  * Create projects
+  * Add members
+  * Create and assign tasks
+  * View all tasks
+* Member:
 
-Create Project
-Add Members
-Create Tasks
-Assign Tasks
-Update Status
-🟢 Step 4 (2 hrs)
+  * View assigned tasks
+  * Update task status
 
-RBAC:
+### 📁 Project Management
 
-Admin → full access
-Member → only assigned tasks
-🟢 Step 5 (1 hr)
+* Create projects
+* Add team members to projects
 
-Dashboard:
+### ✅ Task Management
 
-List tasks
-Show:
-pending
-completed
-overdue
-🟢 Step 6 (1 hr)
+* Create tasks
+* Assign tasks to users
+* Update task status (pending/completed)
 
-Deploy:
+### 📊 Dashboard
 
-Backend → Railway
-DB → MongoDB Atlas
+* Shows:
+
+  * Total tasks
+  * Pending tasks
+  * Completed tasks
+  * Overdue tasks
+
+### ⏰ Overdue Feature
+
+* Tasks with a due date that are not completed are marked as overdue
+
+---
+
+## 🛠️ Tech Stack
+
+* **Frontend:** HTML, CSS, JavaScript
+* **Backend:** Node.js, Express
+* **Database:** MongoDB
+* **Authentication:** JWT
+* **Deployment:**
+
+  * Backend → Railway
+  * Frontend → Vercel
+
+---
+
+## 🌐 Live Demo
+
+* **Frontend:** https://your-vercel-link
+* **Backend:** https://team-task-manager-production-384b.up.railway.app
+
+---
+
+## ⚙️ How to Run Locally
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/team-task-manager.git
+```
+
+### 2. Setup backend
+
+```bash
+cd backend
+npm install
+```
+
+### 3. Create `.env` file
+
+```
+MONGO_URI=your_mongodb_connection
+JWT_SECRET=your_secret_key
+```
+
+### 4. Run backend
+
+```bash
+npm start
+```
+
+### 5. Open frontend
+
+* Open `frontend/login.html`
+* Or use Live Server
+
+---
+
+## 🎥 Demo Video
+
+A short demo video is included showing:
+
+* Login/Register
+* Role-based access
+* Project creation
+* Task assignment
+* Dashboard and overdue tracking
+
+---
+
+## 🎯 Conclusion
+
+This project demonstrates:
+
+* REST API development
+* Database integration
+* Role-based access control
+* Full-stack deployment
+
+---
+
+## 🙌 Note
+
+This project is built as a beginner-friendly full-stack application focusing on functionality and clarity.
