@@ -71,8 +71,8 @@ The goal of this project is to demonstrate a basic full-stack system with authen
 
 ## 🌐 Live Demo
 
-* **Frontend:** https://your-vercel-link
-* **Backend:** https://team-task-manager-production-384b.up.railway.app
+* **Frontend:** https://team-task-manager-olive-eight.vercel.app/
+* **Backend:** https://team-task-manager-production-384b.up.railway.app/
 
 ---
 
@@ -81,7 +81,7 @@ The goal of this project is to demonstrate a basic full-stack system with authen
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/team-task-manager.git
+git clone https://github.com/Z0s-and-O1s/team-task-manager.git
 ```
 
 ### 2. Setup backend
